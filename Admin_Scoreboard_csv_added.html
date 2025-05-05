@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<!-- saved from url=(0092)https://voicefilename.s3.us-east-1.amazonaws.com/fetch_and_insert_test/admin_scoreboard.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>Admin Scoreboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #6c7a89 0%, #46515f 100%); /* Admin-like theme */
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .admin-box {
+            background: #fff;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            border-radius: 18px;
+            padding: 32px 28px 28px 28px;
+            max-width: 800px; /* Wider for table */
+            width: 90%;
+            border: none;
+            position: relative;
+            animation: fadeIn 1s;
+            margin: 20px auto;
+            text-align: center; /* Center content */
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h2, h3 {
+            color: #1e3c72;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        input[type="password"] {
+            padding: 10px;
+            margin-right: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+        button {
+            background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 32px;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-top: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(30,60,114,0.08);
+            transition: background 0.2s, transform 0.1s;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #2a5298 0%, #1e3c72 100%);
+            transform: translateY(-2px) scale(1.03);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #scoreboard-display {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            text-align: left; /* Align table content left */
+        }
+        #scoreboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        #scoreboard-table th, #scoreboard-table td {
+            border: 1px solid #ddd;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        #scoreboard-table th {
+            background-color: #f0f4fa;
+            color: #1e3c72;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body data-new-gr-c-s-check-loaded="14.1234.0" data-gr-ext-installed="">
+    <div class="admin-box">
+        <h2>Admin Access</h2>
+
+        <!-- Password Section -->
+        <div id="password-section">
+            <label for="admin-password">Enter Admin Password:</label>
+            <input type="password" id="admin-password" required="">
+            <button id="login-btn">Login</button>
+            <p id="error-msg" class="error-message" style="display: none;">Incorrect Password!</p>
+        </div>
+
+        <!-- Scoreboard Section (Initially Hidden) -->
+        <div id="scoreboard-section" style="display: none;">
+            <button id="show-scoreboard-btn">Show Scoreboard</button>
+            <button id="download-csv-btn" style="display:none; margin-left:10px;">Download CSV</button>
+            <div id="scoreboard-display" style="display: none;">
+                <!-- Scoreboard table will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const passwordSection = document.getElementById('password-section');
+        const scoreboardSection = document.getElementById('scoreboard-section');
+        const loginBtn = document.getElementById('login-btn');
+        const passwordInput = document.getElementById('admin-password');
+        const errorMsg = document.getElementById('error-msg');
+        const showScoreboardBtn = document.getElementById('show-scoreboard-btn');
+        const scoreboardDisplay = document.getElementById('scoreboard-display');
+        const downloadCsvBtn = document.getElementById('download-csv-btn');
+
+        const correctPassword = "DeepFake"; // The required password
+
+        let latestScores = null; // Store latest fetched data
+
+        loginBtn.addEventListener('click', () => {
+            if (passwordInput.value === correctPassword) {
+                passwordSection.style.display = 'none';
+                scoreboardSection.style.display = 'block';
+                errorMsg.style.display = 'none';
+            } else {
+                errorMsg.style.display = 'block';
+                passwordInput.value = ''; // Clear the input
+            }
+        });
+
+        showScoreboardBtn.addEventListener('click', fetchScoreboard);
+        downloadCsvBtn.addEventListener('click', downloadCSV);
+
+        // --- Function to Fetch and Display Scoreboard (Copied and adapted) ---
+        async function fetchScoreboard() {
+            showScoreboardBtn.textContent = 'Loading...';
+            showScoreboardBtn.disabled = true;
+            scoreboardDisplay.style.display = 'none'; // Hide previous results if retrying
+            downloadCsvBtn.style.display = 'none'; // Hide download button while loading
+
+            // API endpoint (assuming this fetches ALL data for admin)
+            const apiEndpoint =  'https://tktcqnb37h.execute-api.us-east-1.amazonaws.com/fetch_all_latest_stage_final_1/fetchRowsAllLatest_all';  //'https://q00el0q4b5.execute-api.us-east-1.amazonaws.com/FetchAllRowsWithCorsPolicy/FetchAllTheRows'  //'https://gc0w2az8w6.execute-api.us-east-1.amazonaws.com/fetch_data_from_table_prod_stage/scoreboard_top10_fetch';
+
+            try {
+                const response = await fetch(apiEndpoint);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const scores = await response.json();
+                latestScores = scores; // Save for CSV download
+
+                console.log("API Response Data:", JSON.stringify(scores, null, 2)); // Debugging
+
+                if (!scores || scores.length === 0) {
+                    scoreboardDisplay.innerHTML = `<p style="text-align: center;">No scoreboard data available yet.</p>`;
+                    downloadCsvBtn.style.display = 'none';
+                } else {
+                    const columns = Object.keys(scores[0]); // Dynamically get columns
+                    let tableHtml = `<h3>Full Scoreboard</h3>
+                        <div style="overflow-x:auto;">
+                          <table id="scoreboard-table">
+                            <thead><tr>`;
+                    columns.forEach(col => { tableHtml += `<th>${col}</th>`; });
+                    tableHtml += `</tr></thead><tbody>`;
+
+                    scores.forEach(entry => {
+                        tableHtml += '<tr>';
+                        columns.forEach(col => {
+                            // Handle potential arrays in cells (like user_answers/actual_answers)
+                            let cellData = entry[col];
+                            if (Array.isArray(cellData)) {
+                                cellData = cellData.join(', '); // Join array elements for display
+                            }
+                            tableHtml += `<td>${cellData !== undefined && cellData !== null ? cellData : '-'}</td>`;
+                        });
+                        tableHtml += '</tr>';
+                    });
+
+                    tableHtml += `</tbody></table></div>`;
+                    scoreboardDisplay.innerHTML = tableHtml;
+                    downloadCsvBtn.style.display = 'inline-block'; // Show download button
+                }
+                scoreboardDisplay.style.display = 'block'; // Show the scoreboard section
+                // Keep the button enabled in case the user wants to refresh
+                showScoreboardBtn.textContent = 'Refresh Scoreboard';
+                showScoreboardBtn.disabled = false;
+
+            } catch (error) {
+                console.error('Error fetching scoreboard:', error);
+                scoreboardDisplay.innerHTML = `<p class="error-message" style="text-align: center;">Could not load scoreboard. ${error.message}</p>`;
+                scoreboardDisplay.style.display = 'block';
+                showScoreboardBtn.textContent = 'Retry Scoreboard'; // Allow retry
+                showScoreboardBtn.disabled = false;
+                downloadCsvBtn.style.display = 'none';
+            }
+        }
+
+        // --- CSV Download Functionality ---
+        function downloadCSV() {
+            if (!latestScores || !Array.isArray(latestScores) || latestScores.length === 0) {
+                alert('No data to download!');
+                return;
+            }
+            const columns = Object.keys(latestScores[0]);
+            const escapeCSV = (val) => {
+                if (val === null || val === undefined) return '';
+                if (Array.isArray(val)) val = val.join(', ');
+                val = String(val);
+                if (val.includes('"')) val = val.replace(/"/g, '""');
+                if (val.search(/[",\n]/g) >= 0) val = '"' + val + '"';
+                return val;
+            };
+            let csv = columns.join(',') + '\n';
+            latestScores.forEach(row => {
+                csv += columns.map(col => escapeCSV(row[col])).join(',') + '\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'scoreboard.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+
+</body><grammarly-desktop-integration data-grammarly-shadow-root="true"><template shadowrootmode="open"><style>
+      div.grammarly-desktop-integration {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select:none;
+        user-select:none;
+      }
+
+      div.grammarly-desktop-integration:before {
+        content: attr(data-content);
+      }
+    </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration></html>
