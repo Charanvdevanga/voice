@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Voice Assistant</title>
+
+    <!-- Added Google Font Link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Basic styling for the page */
+        body {
+            /* --- Applied Poppins Font --- */
+            font-family: 'Poppins', sans-serif; /* Use Poppins, fallback to generic sans-serif */
+            display: flex;
+            flex-direction: column;
+            align-items: left; /* Center items horizontally */
+            justify-content: space-between; /* Pushes header content up, footer down */
+            min-height: 100vh; /* Use full viewport height */
+            padding: 20px;
+            color: #333; /* Default text color (will be overridden for h1/p) */
+            text-align: left;
+            position: relative; /* Needed for absolute positioning of children */
+
+            /* --- Background Image --- */
+            /* !!! IMPORTANT: Replace with the actual path to your image !!! */
+            background-image: url('https://voicefilename.s3.us-east-1.amazonaws.com/voice_image_latest.png');
+            background-size: cover; /* Cover the entire background */
+            background-position: center center; /* Center the image */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            background-attachment: fixed; /* Keep background fixed during scroll (optional) */
+            /* Add a subtle overlay if needed for text contrast */
+            /* background-color: rgba(0, 0, 0, 0.3); */ /* Example: Darker overlay */
+            /* background-blend-mode: overlay; */ /* Blend overlay with image */
+        }
+
+        h1 {
+            color: #ffffff; /* Pure white */
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* Slightly stronger shadow for white text */
+            margin-top: 20px; /* Add some space from the top edge */
+            /* --- Made H1 Bold --- */
+            font-weight: 700; /* Use the bold weight of Poppins */
+        }
+
+        p {
+             color: #ffffff; /* Pure white */
+             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* Slightly stronger shadow for white text */
+             /* Will use the regular (400) weight of Poppins inherited from body */
+        }
+
+        /* --- ElevenLabs Widget Styling --- */
+        elevenlabs-convai {
+            position: left; /* Position relative to the body */
+            top: 63%;          /* Move top edge to the middle */
+            left: 63%;         /* Move left edge to the middle */
+            transform: translate(-50%, -50%) scale(1.5); /* Center precisely and scale up by 50% */
+            /* Adjust scale(1.5) to make it bigger or smaller */
+            z-index: 10; /* Ensure it's above other static content if needed */
+        }
+
+        /* Footer styles (if you add a footer back) */
+        /*
+        footer {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        footer p small {
+             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+             color: #eee; /* Lighter color for footer on dark background */
+             /* font-family: 'Poppins', sans-serif; /* Ensure footer also uses Poppins */
+        /* } */
+        */
+
+    </style>
+</head>
+<body>
+
+    <!-- Header Content -->
+    <div>
+        <h1>Welcome To HIG Innovation</h1>
+        <p>Click the Start a call button below to interact with the voice assistant.</p>
+    
+
+    <!-- START: ElevenLabs Convai Widget -->
+    <!-- This is now positioned absolutely in the center via CSS -->
+    <elevenlabs-convai agent-id="Sc8kUKKwLQ7K0fynsVRO"></elevenlabs-convai>
+    <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+    <!-- END: ElevenLabs Convai Widget -->
+    </div>
+
+    <!-- Footer Content -->
+    <!-- Removed the footer as it wasn't in the original snippet provided for modification,
+         but you can add it back if needed. -->
+
+</body>
+</html>
